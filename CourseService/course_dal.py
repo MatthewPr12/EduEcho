@@ -28,7 +28,9 @@ class CourseDAL:
         return self.course_info.find_one({"_id": course_id})
 
     def get_all_courses(self):
-        return list(self.course_info.find({}))
+        courses = self.course_info.find({})
+        # Convert each course document's '_id' from ObjectId to string
+        return [{**course, '_id': str(course['_id'])} for course in courses]
 
     def rate_course(self, course_rate):
         # Insert rate using composite _id from course_info's _id and user_id

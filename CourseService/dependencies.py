@@ -18,7 +18,6 @@ uri = (
 
 # Create and configure MongoDB client
 def get_client():
-    print("Getting client")
     client = MongoClient(uri)
     try:
         client.admin.command('ping')
@@ -31,20 +30,17 @@ def get_client():
 
 # Function to get the database
 def get_database():
-    print("Getting database")
     client = get_client()
     return client["сourse_db"]
 
 
 # Function to provide a CourseDAL instance
 def get_course_dal():
-    print("Getting course DAL")
     db = get_database()
     return CourseDAL(db)
 
 
 # Function to provide a CourseService instance
 def get_course_service():
-    print("Getting course service")
     dal = get_course_dal()
     return CourseService(dal)
