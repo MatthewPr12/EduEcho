@@ -1,4 +1,5 @@
 import pymongo
+from bson import ObjectId
 from pymongo import MongoClient
 
 
@@ -25,7 +26,9 @@ class CourseDAL:
 
     def get_course(self, course_id):
         # Querying by _id, which holds the course_id
-        return self.course_info.find_one({"_id": course_id})
+        course = self.course_info.find_one({"_id": ObjectId(course_id)})
+        course['_id'] = str(course['_id'])
+        return course
 
     def get_all_courses(self):
         courses = self.course_info.find({})
