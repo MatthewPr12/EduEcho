@@ -39,7 +39,7 @@ class CourseDAL:
         # Insert rate using composite _id from course_info's _id and user_id
         rate_document = course_rate.dict()
         rate_document['_id'] = {
-            'course_id': rate_document.pop('course_id'),  # Remove and use as part of _id
+            'course_id': ObjectId(rate_document.pop('course_id')),  # Remove and use as part of _id
             'user_id': rate_document.pop('user_id')  # Remove and use as part of _id
         }
         try:
