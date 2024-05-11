@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  feedback-service:
+    image: feedback-service
+    build:
+      context: .
+      dockerfile: feedback_service/Dockerfile
+    environment:
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/code
+    networks:
+      - services-network
+
+networks:
+  services-network:
+    driver: bridge
+    name: services-network
