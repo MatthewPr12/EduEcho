@@ -3,6 +3,7 @@ CREATE KEYSPACE IF NOT EXISTS user_feedbacks WITH REPLICATION = {'class' : 'Simp
 USE user_feedbacks;
 
 
+-- stores comment properties
 CREATE TABLE IF NOT EXISTS course_comments (
     course_id TEXT,
     replied_to_id UUID,
@@ -21,14 +22,16 @@ CREATE TABLE IF NOT EXISTS course_comments (
 );
 
 
+-- stores whether a comment (IDed by [course_id, comment_id]) was liked or disliked by the user (IDed by user_id)
 CREATE TABLE IF NOT EXISTS user_assessments (
     course_id TEXT,
     user_id TEXT,
     comment_id UUID,
-    assessment_type INT,
-    PRIMARY KEY ((course_id, user_id, comment_id), assessment_type)
+    is_like BOOLEAN,
+    PRIMARY KEY ((course_id, comment_id, user_id), is_like)
 );
 
+-- stores the users that have assessed a comment
 CREATE TABLE IF NOT EXISTS comment_assessors (
     course_id TEXT,
     comment_id UUID,

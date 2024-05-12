@@ -12,6 +12,13 @@ class Assessment(Enum):
     DISLIKE_ASSESSMENT = 2
 
 
+assessment_value_to_assessment_type_map: dict[int, Assessment] = {
+    0: Assessment.NO_ASSESSMENT,
+    1: Assessment.LIKE_ASSESSMENT,
+    2: Assessment.DISLIKE_ASSESSMENT,
+}
+
+
 class IdentifiableUserComment(BaseModel):
     course_id: str
     replied_to_id: uuid.UUID
@@ -42,7 +49,7 @@ class CompleteUserComment(PublishableUserComment):
 
     timestamp: datetime.datetime
 
-    current_user_assessment: Optional[Assessment]
+    current_user_assessment: Optional[int]
 
 
 def generate_complete_comment(
