@@ -1,6 +1,6 @@
-## Project Objective
+# Project Objective
 
-# Running the services
+## Running the services
 ```bash
 docker-compose up
 ```
