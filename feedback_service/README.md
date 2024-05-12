@@ -17,9 +17,9 @@ Post a new comment on the course discussion thread.
 
 **Parameters:**
 
-- `publishable_comment` ([PublishableUserComment](feedback_service/user_comment.py#L28)): contains the course thread ID, whether this comment is a reply, and user's ID.
+- `publishable_comment` ([PublishableUserComment](user_comment.py#L28)): contains the course thread ID, whether this comment is a reply, and user's ID.
 
-Returns [CompleteUserComment](feedback_service/user_comment.py#L36) object with all necessary comment properties.
+Returns [CompleteUserComment](user_comment.py#L36) object with all necessary comment properties.
 
 #### PUT: `/comment`
 
@@ -27,7 +27,7 @@ Edits the comment's text message.
 
 **Parameters:**
 
-- `comment` [IdentifiableUserComment](./feedback_service/user_comment.py#L22): stores all the info required to identify the comment.
+- `comment` [IdentifiableUserComment](./user_comment.py#L22): stores all the info required to identify the comment.
 - `new_comment_text` (str): new comment body. The previous text gets erased forever.
 
 
@@ -40,7 +40,7 @@ The comment's ghost is left to ensure the correct tree structure of the discussi
 
 **Parameters:**
 
-`comment` [IdentifiableUserComment](./feedback_service/user_comment.py#L22): stores all the info required to identify the comment.
+`comment` [IdentifiableUserComment](./user_comment.py#L22): stores all the info required to identify the comment.
 
 #### PUT: `/rate_comment`
 
@@ -48,7 +48,7 @@ Allows to specify the new rating (assessment) for a given comment. Each user can
 
 **Parameters:**
 
-- `comment` [IdentifiableUserComment](./feedback_service/user_comment.py#L22): stores all the info required to identify the comment.
+- `comment` [IdentifiableUserComment](./user_comment.py#L22): stores all the info required to identify the comment.
 - `assessor_user_id` (str): the assessor's ID. It is used to check whether he has already rated the comment.
 - `assessment` (int): either $0$, $1$, or $2$.
 	- $0$ means `No Assessment`. Used when the user wants to take back his previous like/dislike.
