@@ -5,7 +5,10 @@ from .user_comment import (
     CompleteUserComment,
     PublishableUserComment,
     IdentifiableUserComment,
+    ID,
 )
+
+from .logging_config import *
 
 
 app = fastapi.FastAPI(title="Courses Feedback Service")
@@ -13,7 +16,9 @@ app = fastapi.FastAPI(title="Courses Feedback Service")
 
 @app.get("/comments")
 def retrieve_comments(
-    course_id: str, replied_to_id: Optional[str] = None
+    course_id: ID,
+    replied_to_id: Optional[ID] = None,
+    current_user_id: Optional[ID] = None,
 ) -> list[CompleteUserComment]:
     return fastapi.Response(content="Not implemented yet", media_type="text/plain")
 
@@ -37,6 +42,6 @@ def delete_comment(comment: IdentifiableUserComment) -> fastapi.Response:
 
 @app.put("/rate_comment")
 def rate_comment(
-    comment: IdentifiableUserComment, assessor_user_id: bool, is_like: bool
+    comment: IdentifiableUserComment, assessor_user_id: ID, is_like: bool
 ) -> fastapi.Response:
     return fastapi.Response(content="Not implemented yet", media_type="text/plain")

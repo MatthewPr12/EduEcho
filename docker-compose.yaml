@@ -1,6 +1,49 @@
 version: "3.8"
 
 services:
+  cassandra-node-1:
+    image: cassandra:latest
+    container_name: cassandra-node-1
+    environment:
+      - CASSANDRA_CLUSTER_NAME=FeedbackCluster
+    ports:
+      - "9042:9042"
+    networks:
+      - cassandra-network
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE keyspaces;'"]
+      interval: 5s
+      timeout: 3s
+      retries: 25
+
+  cassandra-node-2:
+    image: cassandra:latest
+    container_name: cassandra-node-2
+    depends_on:
+      cassandra-node-1:
+        condition: service_healthy
+    environment:
+      - CASSANDRA_SEEDS=cassandra-node-1
+      - CASSANDRA_CLUSTER_NAME=FeedbackCluster
+    networks:
+      - cassandra-network
+
+  feedback-ddl:
+    image: feedback-ddl
+    build:
+      context: .
+      dockerfile: feedback_service/data_access/tables_creation/Dockerfile
+    volumes:
+      - ./feedback_service/data_access/tables_creation:/code
+    environment:
+      PORT: "9042"
+      CASSANDRA_SEEDS: "cassandra-node-1"
+    networks:
+      - cassandra-network
+    depends_on:
+      cassandra-node-1:
+        condition: service_healthy
+
   feedback-service:
     image: feedback-service
     build:
@@ -13,9 +56,17 @@ services:
     volumes:
       - .:/code
     networks:
+      - cassandra-network
       - services-network
+    depends_on:
+      feedback-ddl:
+        condition: service_completed_successfully
+
 
 networks:
   services-network:
     driver: bridge
     name: services-network
+  cassandra-network:
+    driver: bridge
+    name: cassandra-network
