@@ -10,6 +10,8 @@ from .user_comment import (
 
 from .logging_config import *
 
+# from .data_access.feedback_cassandra_client import FeedbackCassandraClient
+
 
 app = fastapi.FastAPI(title="Courses Feedback Service")
 
