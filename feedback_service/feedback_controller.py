@@ -61,7 +61,8 @@ def edit_comment(comment: IdentifiableUserComment, new_comment_text: str) -> fas
 
 @app.delete("/comment")
 def delete_comment(comment: IdentifiableUserComment) -> fastapi.Response:
-    return fastapi.Response(content="Not implemented yet", media_type="text/plain")
+    feedback_cassandra_client.delete_comment(identifiable_comment=comment)
+    return fastapi.Response(content="Comment has been deleted.", media_type="text/plain")
 
 
 @app.put("/rate_comment")

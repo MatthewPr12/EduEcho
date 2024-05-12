@@ -63,6 +63,13 @@ class FeedbackCassandraClient(AbstractCassandraClient):
         )
         self.execute(query)
 
+    def delete_comment(self, identifiable_comment: IdentifiableUserComment) -> None:
+        query = (
+            f"UPDATE {self.keyspace}.{self.course_comments_table} SET is_deleted = True, comment_text = '' "
+            f"WHERE course_id = {identifiable_comment.course_id} AND replied_to_id = {identifiable_comment.replied_to_id} AND comment_id = {identifiable_comment.comment_id}"
+        )
+        self.execute(query)
+
 
 if __name__ == "__main__":
     raise NotImplementedError("Is not and will not be implemented.")
