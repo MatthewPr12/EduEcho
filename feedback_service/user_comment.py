@@ -66,5 +66,5 @@ def generate_complete_comment(
         is_deleted=False,
         is_edited=False,
         timestamp=datetime.datetime.now(),
-        current_user_assessment=None,
+        current_user_assessment=Assessment.NO_ASSESSMENT.value,
     )
