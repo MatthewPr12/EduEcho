@@ -51,6 +51,8 @@ services:
       dockerfile: feedback_service/Dockerfile
     environment:
       PORT: "8080"
+      CASSANDRA_PORT: "9042"
+      CASSANDRA_SEEDS: "cassandra-node-1"
     ports:
       - "8080:8080"
     volumes:

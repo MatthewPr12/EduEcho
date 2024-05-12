@@ -13,14 +13,18 @@ CREATE TABLE IF NOT EXISTS course_comments (
     likes INT,
     dislikes INT,
     is_deleted BOOLEAN,
-    comment_date DATE,
+    is_edited BOOLEAN,
+
+    timestamp TIMESTAMP,
+    
     PRIMARY KEY ((course_id, replied_to_id), comment_id)
 );
 
 
 CREATE TABLE IF NOT EXISTS user_assessments (
+    course_id UUID,
     user_id UUID,
     comment_id UUID,
     assessment_type INT,
-    PRIMARY KEY ((user_id, comment_id), assessment_type)
+    PRIMARY KEY ((course_id, user_id, comment_id), assessment_type)
 );
