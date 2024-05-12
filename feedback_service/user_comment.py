@@ -5,8 +5,6 @@ import uuid
 from enum import Enum
 from typing import Optional
 
-type ID = str
-
 
 class Assessment(Enum):
     NO_ASSESSMENT = 0
@@ -15,24 +13,24 @@ class Assessment(Enum):
 
 
 class IdentifiableUserComment(BaseModel):
-    course_id: ID
-    replied_to_id: ID
-    comment_id: ID
+    course_id: str
+    replied_to_id: uuid.UUID
+    comment_id: uuid.UUID
 
 
 class PublishableUserComment(BaseModel):
-    course_id: ID
-    replied_to_id: ID
-    user_id: ID
+    course_id: str
+    replied_to_id: uuid.UUID
+    user_id: str
 
     comment_text: str
 
 
 class CompleteUserComment(PublishableUserComment):
-    course_id: ID
-    replied_to_id: ID
-    comment_id: ID
-    user_id: ID
+    course_id: str
+    replied_to_id: uuid.UUID
+    comment_id: uuid.UUID
+    user_id: str
 
     comment_text: str
 
@@ -53,7 +51,7 @@ def generate_complete_comment(
     return CompleteUserComment(
         course_id=publishable_comment.course_id,
         replied_to_id=publishable_comment.replied_to_id,
-        comment_id=str(uuid.uuid4()),
+        comment_id=uuid.uuid4(),
         user_id=publishable_comment.user_id,
         comment_text=publishable_comment.comment_text,
         likes=0,

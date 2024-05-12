@@ -2,12 +2,12 @@ import fastapi
 
 import os
 from typing import Optional
+import uuid
 
 from .user_comment import (
     CompleteUserComment,
     PublishableUserComment,
     IdentifiableUserComment,
-    ID,
     generate_complete_comment,
 )
 
@@ -29,9 +29,9 @@ app = fastapi.FastAPI(title="Courses Feedback Service")
 
 @app.get("/comments")
 def retrieve_comments(
-    course_id: ID,
-    replied_to_id: Optional[ID] = None,
-    current_user_id: Optional[ID] = None,
+    course_id: str,
+    replied_to_id: Optional[uuid.UUID] = None,
+    current_user_id: Optional[str] = None,
 ) -> list[CompleteUserComment]:
 
     comments = feedback_cassandra_client.get_course_comments(course_id=course_id, replied_to_id=replied_to_id)
@@ -66,5 +66,6 @@ def delete_comment(comment: IdentifiableUserComment) -> fastapi.Response:
 
 
 @app.put("/rate_comment")
-def rate_comment(comment: IdentifiableUserComment, assessor_user_id: ID, is_like: bool) -> fastapi.Response:
-    return fastapi.Response(content="Not implemented yet", media_type="text/plain")
+def rate_comment(comment: IdentifiableUserComment, assessor_user_id: str, is_like: bool) -> fastapi.Response:
+    feedback_cassandra_client.rate_comment(identifiable_comment=comment, current_user_id=assessor_user_id, is_like=is_like)
+    return fastapi.Response(content="The comment has been rated", media_type="text/plain")
