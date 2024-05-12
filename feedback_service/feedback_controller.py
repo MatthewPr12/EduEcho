@@ -1,5 +1,6 @@
 import fastapi
 from typing import Optional
+
 from .user_comment import (
     CompleteUserComment,
     PublishableUserComment,
