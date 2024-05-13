@@ -8,6 +8,7 @@ router = APIRouter()
 
 @router.post("/")
 async def create_course(course_info: CourseInfo, service: CourseService = Depends(get_course_service)):
+    print("Request received to create a new course")
     return service.create_course(course_info)
 
 

@@ -7,6 +7,7 @@ class CourseService:
         self.dal = dal
 
     def create_course(self, course_info):
+        print("CourseService: Creating course")
         return self.dal.add_course(course_info)
 
     def retrieve_course(self, course_id):
