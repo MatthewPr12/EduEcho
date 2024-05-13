@@ -271,6 +271,8 @@ celerybeat.pid
 
 # Environments
 .env
+*pyc
+.obsidian
 .venv
 env/
 venv/
