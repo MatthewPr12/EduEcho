@@ -21,13 +21,13 @@ assessment_value_to_assessment_type_map: dict[int, Assessment] = {
 
 class IdentifiableUserComment(BaseModel):
     course_id: str
-    replied_to_id: uuid.UUID
+    replied_to_id: Optional[uuid.UUID]
     comment_id: uuid.UUID
 
 
 class PublishableUserComment(BaseModel):
     course_id: str
-    replied_to_id: uuid.UUID
+    replied_to_id: Optional[uuid.UUID]
     user_id: str
 
     comment_text: str
@@ -35,7 +35,7 @@ class PublishableUserComment(BaseModel):
 
 class CompleteUserComment(PublishableUserComment):
     course_id: str
-    replied_to_id: uuid.UUID
+    replied_to_id: Optional[uuid.UUID]
     comment_id: uuid.UUID
     user_id: str
 

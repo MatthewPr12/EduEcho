@@ -4,6 +4,9 @@ from feedback_service.user_comment import CompleteUserComment, IdentifiableUserC
 import uuid
 
 
+_FRESH_COMMENT_UUID = uuid.UUID("43f2fc2a-09e8-40c3-a555-f3761cbf7f6d")
+
+
 class FeedbackCassandraClient(AbstractCassandraClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,13 +17,24 @@ class FeedbackCassandraClient(AbstractCassandraClient):
 
         logging.info("Feedback Cassandra client successfully initialized")
 
+    @staticmethod
+    def expand_replied_to_id(replied_to_id: uuid.UUID | None) -> uuid.UUID:
+        return replied_to_id if replied_to_id else _FRESH_COMMENT_UUID
+
+    @staticmethod
+    def hide_replied_to_id(replied_to_id: uuid.UUID) -> uuid.UUID | None:
+        return replied_to_id if replied_to_id != _FRESH_COMMENT_UUID else None
+
     def get_course_comments(self, course_id: str, replied_to_id: uuid.UUID = None) -> list[CompleteUserComment]:
-        query = f"SELECT * FROM {self.course_comments_table} WHERE " f"course_id = '{course_id}' AND replied_to_id = {replied_to_id}"
+        query = (
+            f"SELECT * FROM {self.course_comments_table} WHERE "
+            f"course_id = '{course_id}' AND replied_to_id = {self.expand_replied_to_id(replied_to_id)}"
+        )
         comments = self.execute(query).all()
         return [
             CompleteUserComment(
                 course_id=str(comment.course_id),
-                replied_to_id=comment.replied_to_id,
+                replied_to_id=self.hide_replied_to_id(comment.replied_to_id),
                 comment_id=comment.comment_id,
                 user_id=str(comment.user_id),
                 comment_text=comment.comment_text,
@@ -41,7 +55,7 @@ class FeedbackCassandraClient(AbstractCassandraClient):
         query = (
             f"INSERT INTO {self.course_comments_table} "
             f"(course_id, replied_to_id, comment_id, user_id, comment_text, likes, dislikes, is_deleted, is_edited, timestamp) "
-            f"VALUES ('{comment.course_id}', {comment.replied_to_id}, {comment.comment_id}, '{comment.user_id}', "
+            f"VALUES ('{comment.course_id}', {self.expand_replied_to_id(comment.replied_to_id)}, {comment.comment_id}, '{comment.user_id}', "
             f"'{comment.comment_text}', {comment.likes}, {comment.dislikes}, {comment.is_deleted}, {comment.is_edited}, '{comment.timestamp}')"
         )
         self.execute(query)
@@ -49,7 +63,7 @@ class FeedbackCassandraClient(AbstractCassandraClient):
     def modify_comment_text(self, identifiable_comment: IdentifiableUserComment, new_comment_text: str) -> None:
         query = (
             f"UPDATE {self.course_comments_table} SET comment_text = '{new_comment_text}', is_edited = True "
-            f"WHERE course_id = '{identifiable_comment.course_id}' AND replied_to_id = {identifiable_comment.replied_to_id} "
+            f"WHERE course_id = '{identifiable_comment.course_id}' AND replied_to_id = {self.expand_replied_to_id(identifiable_comment.replied_to_id)} "
             f"AND comment_id = {identifiable_comment.comment_id}"
         )
         self.execute(query)
@@ -57,7 +71,7 @@ class FeedbackCassandraClient(AbstractCassandraClient):
     def mark_comment_deleted(self, identifiable_comment: IdentifiableUserComment) -> None:
         query = (
             f"UPDATE {self.course_comments_table} SET is_deleted = True, comment_text = '' "
-            f"WHERE course_id = '{identifiable_comment.course_id}' AND replied_to_id = {identifiable_comment.replied_to_id} AND comment_id = {identifiable_comment.comment_id}"
+            f"WHERE course_id = '{identifiable_comment.course_id}' AND replied_to_id = {self.expand_replied_to_id(identifiable_comment.replied_to_id)} AND comment_id = {identifiable_comment.comment_id}"
         )
         self.execute(query)
 
@@ -101,7 +115,7 @@ class FeedbackCassandraClient(AbstractCassandraClient):
         """
         query = (
             f"SELECT likes, dislikes FROM {self.course_comments_table} WHERE "
-            f"course_id = '{comment.course_id}' AND replied_to_id = {comment.replied_to_id} AND comment_id = {comment.comment_id}"
+            f"course_id = '{comment.course_id}' AND replied_to_id = {self.expand_replied_to_id(comment.replied_to_id)} AND comment_id = {comment.comment_id}"
         )
         response = self.execute(query).one()
         return response.likes, response.dislikes
@@ -125,20 +139,17 @@ class FeedbackCassandraClient(AbstractCassandraClient):
             self.execute(user_assessment_deletion_query)
 
         likes, dislikes = self.get_comment_ratings(identifiable_comment)
-        new_likes, new_dislikes = likes, dislikes
-        if current_assessment == Assessment.LIKE_ASSESSMENT:
-            new_likes -= 1
-        elif current_assessment == Assessment.DISLIKE_ASSESSMENT:
-            new_dislikes -= 1
+        updated_likes, updated_dislikes = likes, dislikes
 
-        if assessment == Assessment.LIKE_ASSESSMENT:
-            new_likes += 1
-        elif assessment == Assessment.DISLIKE_ASSESSMENT:
-            new_dislikes += 1
+        updated_likes -= current_assessment == Assessment.LIKE_ASSESSMENT
+        updated_dislikes -= current_assessment == Assessment.DISLIKE_ASSESSMENT
+
+        updated_likes += assessment == Assessment.LIKE_ASSESSMENT
+        updated_dislikes += assessment == Assessment.DISLIKE_ASSESSMENT
 
         courses_query = (
-            f"UPDATE {self.course_comments_table} SET likes = {new_likes}, dislikes = {new_dislikes} "
-            f"WHERE course_id = '{identifiable_comment.course_id}' AND replied_to_id = {identifiable_comment.replied_to_id} AND comment_id = {identifiable_comment.comment_id}"
+            f"UPDATE {self.course_comments_table} SET likes = {updated_likes}, dislikes = {updated_dislikes} "
+            f"WHERE course_id = '{identifiable_comment.course_id}' AND replied_to_id = {self.expand_replied_to_id(identifiable_comment.replied_to_id)} AND comment_id = {identifiable_comment.comment_id}"
         )
         self.execute(courses_query)
 

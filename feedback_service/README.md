@@ -40,7 +40,7 @@ The comment's ghost is left to ensure the correct tree structure of the discussi
 
 **Parameters:**
 
-`comment` [IdentifiableUserComment](./user_comment.py#L22): stores all the info required to identify the comment.
+- `comment` [IdentifiableUserComment](./user_comment.py#L22): stores all the info required to identify the comment.
 
 #### PUT: `/rate_comment`
 
