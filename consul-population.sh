@@ -16,8 +16,21 @@ done
 
 echo "Starting KV Population"
 
+consul kv put MONGO_USERNAME ${MONGO_USERNAME}
+consul kv put MONGO_PASSWORD ${MONGO_PASSWORD}
+
+consul kv put POSTGRES_HOST ${POSTGRES_HOST}
+consul kv put POSTGRES_USER ${POSTGRES_USER}
+consul kv put POSTGRES_PASSWORD ${POSTGRES_PASSWORD}
+
+consul kv put CASSANDRA_CLUSTER_NAME ${CASSANDRA_CLUSTER_NAME}
+consul kv put CASSANDRA_SEEDS ${CASSANDRA_SEEDS}
+
+consul kv put HZ_CLUSTER_NAME ${HZ_CLUSTER_NAME}
 
 consul kv put ${CONSUL_ESSENTIAL_KEY} TRUE
+
+
 
 echo "KV Population Ended!"
 
