@@ -1,5 +1,13 @@
 version: "3.8"
 
+x-hz-common-settings: &hz-common-settings
+  image: hazelcast/hazelcast:latest
+  networks:
+    - hazelcast-network
+
+x-common-env: &hz-common-env
+  HZ_CLUSTERNAME: dev
+
 services:
   cassandra-node-1:
     image: cassandra:latest
@@ -75,6 +83,53 @@ services:
     networks:
       - services-network
 
+
+  hazel-node-1:
+    <<: *hz-common-settings
+    container_name: hazel-node-1
+    environment:
+      <<: *hz-common-env
+      HZ_NETWORK_PUBLICADDRESS: "hazel-node-1:5701"
+    ports:
+      - "5701:5701"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:5701/hazelcast/health/node-state",
+        ]
+      interval: 3s
+      timeout: 1s
+      retries: 15
+      start_period: 5s
+
+  hazel-node-2:
+    <<: *hz-common-settings
+    container_name: hazel-node-2
+    environment:
+      <<: *hz-common-env
+      HZ_NETWORK_PUBLICADDRESS: "hazel-node-2:5701"
+    ports:
+      - "5702:5701"
+    depends_on:
+      hazel-node-1:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:5701/hazelcast/health/node-state",
+        ]
+      interval: 3s
+      timeout: 1s
+      retries: 15
+      start_period: 5s
+
+
   course-service:
     container_name: course-service
     build:
@@ -82,17 +137,25 @@ services:
       dockerfile: CourseService/Dockerfile
     image: course-service
     environment:
-      - MONGO_USERNAME=admin
-      - MONGO_PASSWORD=password
-      - PYTHONPATH=/app
+      MONGO_USERNAME: admin
+      MONGO_PASSWORD: password
+      PYTHONPATH: /app
+      HAZELCAST_CLUSTER_NAME: "dev"
+      HAZELCAST_ADDRESSES: "hazel-node-1:5701,hazel-node-2:5701"
     ports:
       - "8001:8001"
     volumes:
       - .:/app
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_started
+      hazel-node-1:
+        condition: service_healthy
+      hazel-node-2:
+        condition: service_healthy
     networks:
       - services-network
+      - hazelcast-network
 
   entry-endpoint:
     container_name: entry-endpoint
@@ -181,6 +244,9 @@ networks:
   services-network:
     driver: bridge
     name: services-network
+  hazelcast-network:
+    driver: bridge
+    name: hazelcast-network
   cassandra-network:
     driver: bridge
     name: cassandra-network
