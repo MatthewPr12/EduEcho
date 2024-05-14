@@ -64,6 +64,68 @@ services:
       feedback-ddl:
         condition: service_completed_successfully
 
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_PASSWORD: mock
+      POSTGRES_DB: postgres
+    volumes:
+      - ./user_service/data_access/postgres_storage:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 1s
+      retries: 10
+    networks:
+      - postgres-network
+
+  postgres-init:
+    image: postgres:latest
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: "mock"
+    volumes:
+      - ./user_service/data_access/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command:
+      [
+        "psql",
+        "-h",
+        "postgres-db",
+        "-U",
+        "postgres",
+        "-d",
+        "postgres",
+        "-a",
+        "-f",
+        "/docker-entrypoint-initdb.d/init.sql",
+      ]
+    networks:
+      - postgres-network
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user_service/Dockerfile
+    depends_on:
+      postgres-init:
+        condition: service_completed_successfully
+    volumes:
+      - .:/code
+    environment:
+      DB_HOST: postgres-db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: mock
+
+      PORT: 8180
+    ports:
+      - "8180:8180"
+    networks:
+      - postgres-network
+      - services-network
 
 networks:
   services-network:
@@ -72,3 +134,6 @@ networks:
   cassandra-network:
     driver: bridge
     name: cassandra-network
+  postgres-network:
+    driver: bridge
+    name: postgres-network

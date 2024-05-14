@@ -7,7 +7,7 @@ docker-compose up
 
 ## Stopping the services
 ```bash
-docker-compose stop
+docker-compose down
 ```
 
 ## Services Docs
