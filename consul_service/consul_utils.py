@@ -14,7 +14,7 @@ def register_service(service_name, service_id, port):
 
 def get_service_urls(service_name):
     c = consul.Consul()
-    index, services = c.health.service(service_name, passing=True)
+    _, services = c.health.service(service_name, passing=True)
     if services:
         return [f"http://{service['Service']['Address']}:{service['Service']['Port']}"
                 for service in services if service['Service']]
@@ -29,7 +29,7 @@ def set_config(key, value):
 
 def get_config(key):
     c = consul.Consul()
-    index, data = c.kv.get(key)
+    _, data = c.kv.get(key)
     if data:
         return data['Value'].decode('utf-8')
     return None

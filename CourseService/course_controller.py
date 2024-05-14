@@ -3,13 +3,14 @@ from CourseService.models import CourseInfo, CourseRate
 from CourseService.dependencies import get_course_service  # Import the dependency provider function
 from CourseService.course_service import CourseService
 from consul_service.consul_utils import register_service
+import os
 
 app = FastAPI()
 
 
 @app.on_event("startup")
 def startup_event():
-    register_service("course_service", "course_service-01", 8001)
+    register_service("course_service", "course_service-01", os.getenv("PORT"))
 
 
 @app.post("/")
