@@ -138,11 +138,7 @@ services:
     environment:
       <<: *consul-env
 
-      MONGO_USERNAME: ${MONGO_USERNAME}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
       PYTHONPATH: /app
-      HAZELCAST_CLUSTER_NAME: ${HZ_CLUSTER_NAME}
-      HAZELCAST_ADDRESSES: "hazel-node-1:${INTERNAL_HZ_PORT},hazel-node-2:${INTERNAL_HZ_PORT}"
 
       PORT: ${COURSE_SERVICE_PORT}
     ports:
@@ -169,11 +165,7 @@ services:
       dockerfile: EntryEndpoint/Dockerfile
     environment:
       <<: *consul-env
-      MONGO_USERNAME: "${MONGO_USERNAME}"
-      MONGO_PASSWORD: "${MONGO_PASSWORD}"
       PYTHONPATH: /app
-      HAZELCAST_CLUSTER_NAME: "${HZ_CLUSTER_NAME}"
-      HAZELCAST_ADDRESSES: "hazel-node-1:${INTERNAL_HZ_PORT},hazel-node-2:${INTERNAL_HZ_PORT}"
       PORT: ${ENTRYPOINT_PORT}
     ports:
       - "8000:${ENTRYPOINT_PORT}"
@@ -245,12 +237,6 @@ services:
       - .:/code
     environment:
       <<: *consul-env
-
-      DB_HOST: ${POSTGRES_HOST}
-      DB_NAME: postgres
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-
       PORT: ${USER_SERVICE_PORT}
     ports:
       - "8180:${USER_SERVICE_PORT}"
@@ -271,6 +257,30 @@ services:
       - services-network
     environment:
       <<: *consul-env
+
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+
+      HZ_CLUSTER_NAME: "${HZ_CLUSTER_NAME}"
+      INTERNAL_HZ_PORT: "${INTERNAL_HZ_PORT}"
+      HAZELCAST_ADDRESSES: "${HAZELCAST_ADDRESSES}"
+
+      ENTRYPOINT_PORT: "${ENTRYPOINT_PORT}"
+
+      COURSE_SERVICE_PORT: "${COURSE_SERVICE_PORT}"
+
+      POSTGRES_DB_NAME: "${POSTGRES_DB_NAME}"
+      POSTGRES_HOST: "${POSTGRES_HOST}"
+      POSTGRES_USER: "${POSTGRES_HOST}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+
+      FEEDBACK_SERVICE_PORT: "${FEEDBACK_SERVICE_PORT}"
+      CASSANDRA_PORT: "${CASSANDRA_PORT}"
+      CASSANDRA_CLUSTER_NAME: "${CASSANDRA_CLUSTER_NAME}"
+      CASSANDRA_SEEDS: "${CASSANDRA_SEEDS}"
+
       CONSUL_ESSENTIAL_KEY: "${CONSUL_ESSENTIAL_KEY}"
     healthcheck:
       test:

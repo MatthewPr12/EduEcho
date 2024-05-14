@@ -1,9 +1,10 @@
 from hazelcast import HazelcastClient
 import os
-from dotenv import load_dotenv
+from consul_service.consul_utils import get_config
 
-HAZELCAST_CLUSTER_NAME = os.getenv("HAZELCAST_CLUSTER_NAME")
-HAZELCAST_ADDRESSES = os.getenv("HAZELCAST_ADDRESSES").split(",")
+
+HAZELCAST_CLUSTER_NAME = get_config("HAZELCAST_CLUSTER_NAME")
+HAZELCAST_ADDRESSES = get_config("HAZELCAST_ADDRESSES").split(",")
 
 # load_dotenv()
 

@@ -5,6 +5,7 @@ import os
 from user_service.logging_config import *
 from consul_service.consul_utils import get_config
 
+
 class PostgresClient:
     def __init__(self):
         self.conn = self.connect()
@@ -12,7 +13,10 @@ class PostgresClient:
     def connect(self):
         try:
             conn = psycopg2.connect(
-                dbname=os.getenv("DB_NAME"), user=get_config("DB_USER"), password=get_config("POSTGRES_PASSWORD"), host=get_config("DB_HOST")
+                dbname=get_config("POSTGRES_DB_NAME"),
+                user=get_config("POSTGRES_USER"),
+                password=get_config("POSTGRES_PASSWORD"),
+                host=get_config("POSTGRES_HOST"),
             )
             logging.info("Connected to PostgreSQL database.")
             return conn
