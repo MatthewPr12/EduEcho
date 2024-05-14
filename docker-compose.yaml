@@ -185,7 +185,7 @@ services:
       mongodb:
         condition: service_started
       course-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - services-network
 
@@ -272,7 +272,6 @@ services:
     environment:
       <<: *consul-env
       CONSUL_ESSENTIAL_KEY: "${CONSUL_ESSENTIAL_KEY}"
-      CONSUL_PORT: "${CONSUL_PORT}"
     healthcheck:
       test:
         [
