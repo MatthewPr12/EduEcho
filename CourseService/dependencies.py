@@ -31,7 +31,7 @@ def get_client():
 # Function to get the database
 def get_database():
     client = get_client()
-    return client["courseDatabase"]  # Change "courseDatabase" to your actual database name if different
+    return client["сourse_db"]
 
 
 # Function to provide a CourseDAL instance

@@ -64,6 +64,7 @@ services:
       feedback-ddl:
         condition: service_completed_successfully
 
+
   postgres-db:
     image: postgres:latest
     container_name: postgres-db
@@ -126,6 +127,7 @@ services:
     networks:
       - postgres-network
       - services-network
+
 
 networks:
   services-network:
