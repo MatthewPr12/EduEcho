@@ -1,8 +1,8 @@
 import consul
-
+import os
 
 def register_service(service_name, service_id, port):
-    c = consul.Consul(host='localhost', port=8500)
+    c = consul.Consul(host=os.getenv("CONSUL_PORT"), port=os.getenv("CONSUL_PORT"))
     c.agent.service.register(
         name=service_name,
         service_id=service_id,

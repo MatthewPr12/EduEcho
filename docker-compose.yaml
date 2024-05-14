@@ -77,9 +77,11 @@ services:
       context: .
       dockerfile: feedback_service/Dockerfile
     environment:
+      <<: *consul-env
       PORT: "${FEEDBACK_SERVICE_PORT}"
       CASSANDRA_PORT: "${CASSANDRA_PORT}"
       CASSANDRA_SEEDS: ${CASSANDRA_SEEDS}
+
     ports:
       - "8080:${FEEDBACK_SERVICE_PORT}"
     volumes:
@@ -134,6 +136,8 @@ services:
       dockerfile: CourseService/Dockerfile
     image: course-service
     environment:
+      <<: *consul-env
+
       MONGO_USERNAME: ${MONGO_USERNAME}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
       PYTHONPATH: /app
@@ -143,7 +147,6 @@ services:
       PORT: ${COURSE_SERVICE_PORT}
     ports:
       - "8001:${COURSE_SERVICE_PORT}"
-
     volumes:
       - .:/app
     depends_on:
@@ -165,12 +168,13 @@ services:
       context: .
       dockerfile: EntryEndpoint/Dockerfile
     environment:
-      - MONGO_USERNAME=admin
-      - MONGO_PASSWORD=password
-      - PYTHONPATH=/app
-      - HAZELCAST_CLUSTER_NAME="dev"
-      - HAZELCAST_ADDRESSES="hazel-node-1:5701,hazel-node-2:5701"
-      - PORT=${ENTRYPOINT_PORT}
+      <<: *consul-env
+      MONGO_USERNAME: "${MONGO_USERNAME}"
+      MONGO_PASSWORD: "${MONGO_PASSWORD}"
+      PYTHONPATH: /app
+      HAZELCAST_CLUSTER_NAME: "${HZ_CLUSTER_NAME}"
+      HAZELCAST_ADDRESSES: "hazel-node-1:${INTERNAL_HZ_PORT},hazel-node-2:${INTERNAL_HZ_PORT}"
+      PORT: ${ENTRYPOINT_PORT}
     ports:
       - "8000:${ENTRYPOINT_PORT}"
     volumes:
@@ -240,6 +244,8 @@ services:
     volumes:
       - .:/code
     environment:
+      <<: *consul-env
+
       DB_HOST: ${POSTGRES_HOST}
       DB_NAME: postgres
       DB_USER: ${POSTGRES_USER}
@@ -264,6 +270,7 @@ services:
     networks:
       - services-network
     environment:
+      <<: *consul-env
       CONSUL_ESSENTIAL_KEY: "${CONSUL_ESSENTIAL_KEY}"
       CONSUL_PORT: "${CONSUL_PORT}"
     healthcheck:
