@@ -22,4 +22,4 @@ ENV MONGO_USERNAME=admin
 ENV MONGO_PASSWORD=password
 
 # Run the app when the container launches
-CMD ["uvicorn", "EntryEndpoint.entry_endpoint_controller:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT "uvicorn EntryEndpoint.entry_endpoint_controller:app --host 0.0.0.0 --port $PORT --reload" 

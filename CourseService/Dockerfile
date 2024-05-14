@@ -20,4 +20,4 @@ ENV MONGO_PASSWORD=password
 ENV PYTHONPATH=/app
 
 # Run app.py when the container launches
-CMD ["uvicorn", "CourseService.course_controller:router", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+ENTRYPOINT "uvicorn CourseService.course_controller:router --host 0.0.0.0 --port $PORT --reload"

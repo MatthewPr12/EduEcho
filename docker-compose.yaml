@@ -137,8 +137,11 @@ services:
       PYTHONPATH: /app
       HAZELCAST_CLUSTER_NAME: ${HZ_CLUSTER_NAME}
       HAZELCAST_ADDRESSES: "hazel-node-1:${INTERNAL_HZ_PORT},hazel-node-2:${INTERNAL_HZ_PORT}"
+
+      PORT: ${COURSE_SERVICE_PORT}
     ports:
-      - "${COURSE_SERVICE_PORT}:${COURSE_SERVICE_PORT}"
+      - "8001:${COURSE_SERVICE_PORT}"
+
     volumes:
       - .:/app
     depends_on:
@@ -161,8 +164,9 @@ services:
       - MONGO_USERNAME=admin
       - MONGO_PASSWORD=password
       - PYTHONPATH=/app
+      - PORT=${ENTRYPOINT_PORT}
     ports:
-      - "${ENTRYPOINT_PORT}:${ENTRYPOINT_PORT}"
+      - "8000:${ENTRYPOINT_PORT}"
     volumes:
       - .:/app
     depends_on:
@@ -231,7 +235,7 @@ services:
 
       PORT: ${USER_SERVICE_PORT}
     ports:
-      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+      - "8180:${USER_SERVICE_PORT}"
     networks:
       - postgres-network
       - services-network
