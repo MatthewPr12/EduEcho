@@ -88,6 +88,8 @@ services:
       - cassandra-network
       - services-network
     depends_on:
+      consul:
+        condition: service_healthy
       feedback-ddl:
         condition: service_completed_successfully
 
@@ -145,6 +147,8 @@ services:
     volumes:
       - .:/app
     depends_on:
+      consul:
+        condition: service_healthy
       mongodb:
         condition: service_started
       hazel-node-1:
@@ -172,8 +176,12 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - mongodb
-      - course-service
+      consul:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      course-service:
+        condition: service_healthy
     networks:
       - services-network
 
@@ -227,6 +235,8 @@ services:
     depends_on:
       postgres-init:
         condition: service_completed_successfully
+      consul:
+        condition: service_healthy
     volumes:
       - .:/code
     environment:
