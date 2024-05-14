@@ -323,6 +323,5 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,macos,pycharm
 
+.idea/*
 user_service/data_access/postgres_storage/*
-
-.idea
