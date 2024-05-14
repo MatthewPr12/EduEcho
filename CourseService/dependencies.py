@@ -2,12 +2,10 @@ from pymongo.mongo_client import MongoClient
 from CourseService.course_dal import CourseDAL
 from CourseService.course_service import CourseService
 import os
-from dotenv import load_dotenv
+from consul_service.consul_utils import get_config
 
-# load_dotenv()
-
-MONGO_USERNAME = os.getenv("MONGO_USERNAME")
-MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
+MONGO_USERNAME = get_config("MONGO_USERNAME")
+MONGO_PASSWORD = get_config("MONGO_PASSWORD")
 
 # uri = (
 #     f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}"

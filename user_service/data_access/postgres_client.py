@@ -3,7 +3,7 @@ from psycopg2.extras import RealDictCursor
 import os
 
 from user_service.logging_config import *
-
+from consul_service.consul_utils import get_config
 
 class PostgresClient:
     def __init__(self):
@@ -12,7 +12,7 @@ class PostgresClient:
     def connect(self):
         try:
             conn = psycopg2.connect(
-                dbname=os.environ["DB_NAME"], user=os.environ["DB_USER"], password=os.environ["DB_PASSWORD"], host=os.environ["DB_HOST"]
+                dbname=os.getenv("DB_NAME"), user=get_config("DB_USER"), password=get_config("POSTGRES_PASSWORD"), host=get_config("DB_HOST")
             )
             logging.info("Connected to PostgreSQL database.")
             return conn

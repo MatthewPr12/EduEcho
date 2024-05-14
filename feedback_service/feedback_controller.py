@@ -12,14 +12,14 @@ from .user_comment import (
     assessment_value_to_assessment_type_map,
 )
 
-from consul_service.consul_utils import register_service
+from consul_service.consul_utils import register_service, get_config
 
 from .data_access.feedback_cassandra_client import FeedbackCassandraClient
 
 
 feedback_cassandra_client = FeedbackCassandraClient(
-    host=os.getenv("CASSANDRA_SEEDS"),
-    port=os.getenv("CASSANDRA_PORT"),
+    host=get_config("CASSANDRA_SEEDS"),
+    port=get_config("CASSANDRA_PORT"),
     keyspace="user_feedbacks",
 )
 
