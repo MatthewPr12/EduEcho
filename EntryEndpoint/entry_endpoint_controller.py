@@ -1,15 +1,24 @@
 from fastapi import FastAPI, HTTPException
 from consul_service.consul_utils import get_service_urls
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from typing import Optional
 import httpx
+from consul_service.consul_utils import register_service
 
 app = FastAPI()
+register_service("entry_endpoint", "entry_endpoint-01", 8000)
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse(url="/docs")
 
 
 @app.post("/course/")
 async def create_course(course_info: dict):
+    print("Request received to create a new course")
     course_service_url = get_service_urls('course_service')[0]
+    print(course_service_url)
     async with httpx.AsyncClient() as client:
         response = await client.post(f"{course_service_url}/", json=course_info)
         return JSONResponse(content=response.json(), status_code=response.status_code)

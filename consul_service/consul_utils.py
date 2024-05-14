@@ -8,7 +8,6 @@ c = consul.Consul(host=os.getenv("CONSUL_HOST"), port=os.getenv("CONSUL_PORT"))
 def register_service(service_name, service_id, port):
     c.agent.service.register(name=service_name, service_id=service_id, address=socket.gethostname(), port=port, tags=["microservice"])
 
-
 def get_service_urls(service_name):
     _, services = c.health.service(service_name, passing=True)
     if services:
