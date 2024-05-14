@@ -1,0 +1,25 @@
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY EntryEndpoint/requirements.txt /app/EntryEndpoint/requirements.txt
+#COPY . /app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r EntryEndpoint/requirements.txt
+
+# Set the PYTHONPATH environment variable
+ENV PYTHONPATH=/app
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Define environment variable for MongoDB credentials
+ENV MONGO_USERNAME=admin
+ENV MONGO_PASSWORD=password
+
+# Run the app when the container launches
+CMD ["uvicorn", "EntryEndpoint.entry_endpoint_controller:app", "--host", "0.0.0.0", "--port", "8000"]

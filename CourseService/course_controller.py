@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
-from .models import CourseInfo, CourseRate
-from .dependencies import get_course_service  # Import the dependency provider function
-from .course_service import CourseService
+from CourseService.models import CourseInfo, CourseRate
+from CourseService.dependencies import get_course_service  # Import the dependency provider function
+from CourseService.course_service import CourseService
 
 router = APIRouter()
 

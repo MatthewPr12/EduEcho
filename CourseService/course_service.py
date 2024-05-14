@@ -1,5 +1,5 @@
-from .course_dal import CourseDAL
-from .models import CourseInfo, CourseRate
+from CourseService.course_dal import CourseDAL
+from CourseService.models import CourseInfo, CourseRate
 
 
 class CourseService:

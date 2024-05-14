@@ -1,0 +1,24 @@
+# Exclude virtual environments
+.venv
+
+# Exclude Python bytecode
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Exclude logs and data files that should not be included in the build
+*.log
+*.csv
+*.data
+*.pid
+
+# Exclude specific files or directories
+HW*.pdf
+test_main.http
+post_messages.http
+
+# Other common directories to exclude
+.git
+.gitignore
+node_modules

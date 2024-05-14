@@ -1,6 +1,6 @@
 from pymongo.mongo_client import MongoClient
-from .course_dal import CourseDAL
-from .course_service import CourseService
+from CourseService.course_dal import CourseDAL
+from CourseService.course_service import CourseService
 import os
 from dotenv import load_dotenv
 
@@ -9,10 +9,12 @@ load_dotenv()
 MONGO_USERNAME = os.getenv("MONGO_USERNAME")
 MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
 
-
+# uri = (
+#     f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}"
+#     "@clusterucu.24uib8z.mongodb.net/?retryWrites=true&w=majority&appName=ClusterUCU"
+# )
 uri = (
-    f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}"
-    "@clusterucu.24uib8z.mongodb.net/?retryWrites=true&w=majority&appName=ClusterUCU"
+    f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@mongodb:27017/?retryWrites=true&w=majority"
 )
 
 

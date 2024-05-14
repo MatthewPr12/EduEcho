@@ -64,6 +64,54 @@ services:
       feedback-ddl:
         condition: service_completed_successfully
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27017:27017"
+    networks:
+      - services-network
+
+  course-service:
+    container_name: course-service
+    build:
+      context: .
+      dockerfile: CourseService/Dockerfile
+    image: course-service
+    environment:
+      - MONGO_USERNAME=admin
+      - MONGO_PASSWORD=password
+      - PYTHONPATH=/app
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+    depends_on:
+      - mongodb
+    networks:
+      - services-network
+
+  entry-endpoint:
+    container_name: entry-endpoint
+    build:
+      context: .
+      dockerfile: EntryEndpoint/Dockerfile
+    environment:
+      - MONGO_USERNAME=admin
+      - MONGO_PASSWORD=password
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - mongodb
+      - course-service
+    networks:
+      - services-network
 
   postgres-db:
     image: postgres:latest
