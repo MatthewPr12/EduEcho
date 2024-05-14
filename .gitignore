@@ -322,3 +322,5 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,macos,pycharm
+
+user_service/data_access/postgres_storage/*
