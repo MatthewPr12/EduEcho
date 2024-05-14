@@ -1,4 +1,4 @@
-# Project Objective
+# Project Objective & Description
 
 ## Running the services
 ```bash
