@@ -9,13 +9,10 @@ from .user_comment import (
     PublishableUserComment,
     IdentifiableUserComment,
     generate_complete_comment,
-    Assessment,
     assessment_value_to_assessment_type_map,
 )
 
-from EntryEndpoint.consul_utils import register_service
-
-from .logging_config import *
+from consul_service.consul_utils import register_service
 
 from .data_access.feedback_cassandra_client import FeedbackCassandraClient
 

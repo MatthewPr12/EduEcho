@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from CourseService.models import CourseInfo, CourseRate
 from CourseService.dependencies import get_course_service  # Import the dependency provider function
 from CourseService.course_service import CourseService
-from EntryEndpoint.consul_utils import register_service
+from consul_service.consul_utils import register_service
 
 app = FastAPI()
 

@@ -3,7 +3,7 @@ import fastapi
 from typing import Optional
 from user_service.data_access.postgres_client import PostgresClient
 from user_service.user_credentials import UserCredentials
-from EntryEndpoint.consul_utils import register_service
+from consul_service.consul_utils import register_service
 
 postgres_client = PostgresClient()
 
