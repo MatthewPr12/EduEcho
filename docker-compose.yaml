@@ -50,7 +50,7 @@ services:
       cassandra-node-1:
         condition: service_healthy
     environment:
-      - CASSANDRA_SEEDS="${CASSANDRA_SEEDS}"
+      - CASSANDRA_SEEDS=${CASSANDRA_SEEDS}
       - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME}
     networks:
       - cassandra-network
@@ -64,7 +64,7 @@ services:
       - ./feedback_service/data_access/tables_creation:/code
     environment:
       PORT: "${CASSANDRA_PORT}"
-      CASSANDRA_SEEDS: "${CASSANDRA_SEEDS}"
+      CASSANDRA_SEEDS: ${CASSANDRA_SEEDS}
     networks:
       - cassandra-network
     depends_on:
@@ -79,7 +79,7 @@ services:
     environment:
       PORT: "${FEEDBACK_SERVICE_PORT}"
       CASSANDRA_PORT: "${CASSANDRA_PORT}"
-      CASSANDRA_SEEDS: "${CASSANDRA_SEEDS}"
+      CASSANDRA_SEEDS: ${CASSANDRA_SEEDS}
     ports:
       - "8080:${FEEDBACK_SERVICE_PORT}"
     volumes:
