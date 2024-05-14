@@ -1,5 +1,9 @@
 version: "3.8"
 
+x-consul-env: &consul-env
+  CONSUL_HOST: "${CONSUL_HOST}"
+  CONSUL_PORT: "${CONSUL_PORT}"
+
 x-hz-common-settings: &hz-common-settings
   image: hazelcast/hazelcast:latest
   networks:
@@ -8,14 +12,29 @@ x-hz-common-settings: &hz-common-settings
 x-common-env: &hz-common-env
   HZ_CLUSTERNAME: dev
 
+x-healthcheck: &healthcheck
+  healthcheck:
+    test:
+      [
+        "CMD",
+        "curl",
+        "-f",
+        "http://localhost:${INTERNAL_HZ_PORT}/hazelcast/health/node-state",
+      ]
+    interval: 3s
+    timeout: 1s
+    retries: 15
+    start_period: 5s
+
 services:
   cassandra-node-1:
     image: cassandra:latest
     container_name: cassandra-node-1
     environment:
-      - CASSANDRA_CLUSTER_NAME=FeedbackCluster
+      - CASSANDRA_SEEDS=${CASSANDRA_SEEDS}
+      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME}
     ports:
-      - "9042:9042"
+      - "9042:${CASSANDRA_PORT}"
     networks:
       - cassandra-network
     healthcheck:
@@ -31,8 +50,8 @@ services:
       cassandra-node-1:
         condition: service_healthy
     environment:
-      - CASSANDRA_SEEDS=cassandra-node-1
-      - CASSANDRA_CLUSTER_NAME=FeedbackCluster
+      - CASSANDRA_SEEDS="${CASSANDRA_SEEDS}"
+      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME}
     networks:
       - cassandra-network
 
@@ -44,8 +63,8 @@ services:
     volumes:
       - ./feedback_service/data_access/tables_creation:/code
     environment:
-      PORT: "9042"
-      CASSANDRA_SEEDS: "cassandra-node-1"
+      PORT: "${CASSANDRA_PORT}"
+      CASSANDRA_SEEDS: "${CASSANDRA_SEEDS}"
     networks:
       - cassandra-network
     depends_on:
@@ -58,11 +77,11 @@ services:
       context: .
       dockerfile: feedback_service/Dockerfile
     environment:
-      PORT: "8080"
-      CASSANDRA_PORT: "9042"
-      CASSANDRA_SEEDS: "cassandra-node-1"
+      PORT: "${FEEDBACK_SERVICE_PORT}"
+      CASSANDRA_PORT: "${CASSANDRA_PORT}"
+      CASSANDRA_SEEDS: "${CASSANDRA_SEEDS}"
     ports:
-      - "8080:8080"
+      - "8080:${FEEDBACK_SERVICE_PORT}"
     volumes:
       - .:/code
     networks:
@@ -76,59 +95,35 @@ services:
     image: mongo:latest
     container_name: mongodb
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     ports:
       - "27017:27017"
     networks:
       - services-network
-
 
   hazel-node-1:
     <<: *hz-common-settings
     container_name: hazel-node-1
     environment:
       <<: *hz-common-env
-      HZ_NETWORK_PUBLICADDRESS: "hazel-node-1:5701"
+      HZ_NETWORK_PUBLICADDRESS: "hazel-node-1:${INTERNAL_HZ_PORT}"
     ports:
-      - "5701:5701"
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:5701/hazelcast/health/node-state",
-        ]
-      interval: 3s
-      timeout: 1s
-      retries: 15
-      start_period: 5s
+      - "5701:${INTERNAL_HZ_PORT}"
+    <<: *healthcheck
 
   hazel-node-2:
     <<: *hz-common-settings
     container_name: hazel-node-2
     environment:
       <<: *hz-common-env
-      HZ_NETWORK_PUBLICADDRESS: "hazel-node-2:5701"
+      HZ_NETWORK_PUBLICADDRESS: "hazel-node-2:${INTERNAL_HZ_PORT}"
     ports:
-      - "5702:5701"
+      - "5702:${INTERNAL_HZ_PORT}"
     depends_on:
       hazel-node-1:
         condition: service_healthy
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:5701/hazelcast/health/node-state",
-        ]
-      interval: 3s
-      timeout: 1s
-      retries: 15
-      start_period: 5s
-
+    <<: *healthcheck
 
   course-service:
     container_name: course-service
@@ -137,13 +132,13 @@ services:
       dockerfile: CourseService/Dockerfile
     image: course-service
     environment:
-      MONGO_USERNAME: admin
-      MONGO_PASSWORD: password
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
       PYTHONPATH: /app
-      HAZELCAST_CLUSTER_NAME: "dev"
-      HAZELCAST_ADDRESSES: "hazel-node-1:5701,hazel-node-2:5701"
+      HAZELCAST_CLUSTER_NAME: ${HZ_CLUSTER_NAME}
+      HAZELCAST_ADDRESSES: "hazel-node-1:${INTERNAL_HZ_PORT},hazel-node-2:${INTERNAL_HZ_PORT}"
     ports:
-      - "8001:8001"
+      - "${COURSE_SERVICE_PORT}:${COURSE_SERVICE_PORT}"
     volumes:
       - .:/app
     depends_on:
@@ -167,7 +162,7 @@ services:
       - MONGO_PASSWORD=password
       - PYTHONPATH=/app
     ports:
-      - "8000:8000"
+      - "${ENTRYPOINT_PORT}:${ENTRYPOINT_PORT}"
     volumes:
       - .:/app
     depends_on:
@@ -180,12 +175,14 @@ services:
     image: postgres:latest
     container_name: postgres-db
     environment:
-      POSTGRES_PASSWORD: mock
       POSTGRES_DB: postgres
+
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
     volumes:
       - ./user_service/data_access/postgres_storage:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 3s
       timeout: 1s
       retries: 10
@@ -198,16 +195,16 @@ services:
       postgres-db:
         condition: service_healthy
     environment:
-      PGPASSWORD: "mock"
+      PGPASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
       - ./user_service/data_access/init.sql:/docker-entrypoint-initdb.d/init.sql
     command:
       [
         "psql",
         "-h",
-        "postgres-db",
+        "${POSTGRES_HOST}",
         "-U",
-        "postgres",
+        "${POSTGRES_USER}",
         "-d",
         "postgres",
         "-a",
@@ -227,18 +224,43 @@ services:
     volumes:
       - .:/code
     environment:
-      DB_HOST: postgres-db
+      DB_HOST: ${POSTGRES_HOST}
       DB_NAME: postgres
-      DB_USER: postgres
-      DB_PASSWORD: mock
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
 
-      PORT: 8180
+      PORT: ${USER_SERVICE_PORT}
     ports:
-      - "8180:8180"
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
     networks:
       - postgres-network
       - services-network
 
+  consul:
+    image: hashicorp/consul:latest
+    command: "/bin/sh -c 'sh /consul-population.sh'"
+    container_name: consul-server
+    volumes:
+      - ./consul-population.sh:/consul-population.sh
+    ports:
+      - "${CONSUL_PORT}:${CONSUL_PORT}"
+      - "8600:8600/udp"
+    networks:
+      - services-network
+    environment:
+      CONSUL_ESSENTIAL_KEY: "${CONSUL_ESSENTIAL_KEY}"
+      CONSUL_PORT: "${CONSUL_PORT}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:${CONSUL_PORT}/v1/kv/${CONSUL_ESSENTIAL_KEY}",
+        ]
+      interval: 5s
+      timeout: 1s
+      retries: 3
 
 networks:
   services-network:
