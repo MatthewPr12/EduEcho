@@ -10,7 +10,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 def startup_event():
-    register_service("course_service", "course_service-01", os.getenv("PORT"))
+    register_service("course_service", "course_service-01", int(os.getenv("PORT")))
 
 
 @app.post("/")

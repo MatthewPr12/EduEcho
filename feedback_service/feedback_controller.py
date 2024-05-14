@@ -29,7 +29,7 @@ app = fastapi.FastAPI(title="Courses Feedback Service")
 
 @app.on_event("startup")
 def startup_event():
-    register_service("feedback_service", "feedback_service-1", 8080)
+    register_service("feedback_service", "feedback_service-1", int(os.getenv("PORT")))
 
 
 @app.get("/comments")
