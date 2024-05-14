@@ -164,6 +164,8 @@ services:
       - MONGO_USERNAME=admin
       - MONGO_PASSWORD=password
       - PYTHONPATH=/app
+      - HAZELCAST_CLUSTER_NAME="dev"
+      - HAZELCAST_ADDRESSES="hazel-node-1:5701,hazel-node-2:5701"
       - PORT=${ENTRYPOINT_PORT}
     ports:
       - "8000:${ENTRYPOINT_PORT}"

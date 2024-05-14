@@ -13,6 +13,7 @@ from .user_comment import (
     assessment_value_to_assessment_type_map,
 )
 
+from EntryEndpoint.consul_utils import register_service
 
 from .logging_config import *
 
@@ -27,6 +28,11 @@ feedback_cassandra_client = FeedbackCassandraClient(
 
 
 app = fastapi.FastAPI(title="Courses Feedback Service")
+
+
+@app.on_event("startup")
+def startup_event():
+    register_service("feedback_service", "feedback_service-1", 8080)
 
 
 @app.get("/comments")

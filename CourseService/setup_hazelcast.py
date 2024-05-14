@@ -2,10 +2,10 @@ from hazelcast import HazelcastClient
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-
 HAZELCAST_CLUSTER_NAME = os.getenv("HAZELCAST_CLUSTER_NAME")
 HAZELCAST_ADDRESSES = os.getenv("HAZELCAST_ADDRESSES").split(",")
+
+# load_dotenv()
 
 
 def get_hazelcast_client():
