@@ -64,4 +64,4 @@ async def handle_courses(request: Request, path: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.request(method=request.method, url=url, headers=request.headers.raw, content=await request.body())
-    return response.json()
+    return response.text
