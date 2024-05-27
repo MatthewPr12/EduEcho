@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Dict
+from bson import ObjectId
 
 
 class CourseInfo(BaseModel):
@@ -19,6 +20,12 @@ class CourseRate(BaseModel):
     user_id: str
     rating: int
     id: Optional[Dict[str, str]] = Field(None, alias='_id')
+
+    @field_validator('course_id')
+    def course_id_must_be_valid(cls, value):
+        if not ObjectId.is_valid(value):
+            raise ValueError('Invalid course ID format')
+        return value
 
     class Config:
         populate_by_name = True
