@@ -25,12 +25,12 @@
 
 ## Running the services
 ```bash
-docker-compose up
+docker compose up -d
 ```
 
 ## Stopping the services
 ```bash
-docker-compose down
+docker compose down
 ```
 
 
